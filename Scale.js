@@ -55,14 +55,14 @@ const createFretFreq = () => {
     const fret = {};
 
     guitarNotes.forEach(gn => {
-        fret[gn] = []
+        fret[gn] = [];
 
         const currentNoteIndex = notes.indexOf(gn);
         let tmpIndex = currentNoteIndex;
         let frequencyFactor = 4;
         Array.from({ length: 14 }, (cur, index) => {
-            let currentNote = undefined
-            console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex])
+            let currentNote = undefined;
+            console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex]);
 
             if (tmpIndex == notes.length - 1) {
                 currentNote = notes[0];
@@ -80,51 +80,17 @@ const createFretFreq = () => {
     })
 }
 
-function calcDistance(x1, y1, x2, y2) {
-    const dx = x1 - x2;
-    const dy = y1 - y2;
-    return Math.sqrt(dx * dx + dy * dy);
+function useForceUpdate(){
+    const [value, setValue] = React.useState(0); // integer state
+    return () => setValue(value => value + 1); // update the state to force render
 }
 
 const Scale = () => {
     const width = Dimensions.get('window').width;
     const height = Dimensions.get('window').height;
+    const forceUpdate = useForceUpdate();
     const totalWidth = width * 5;
     const [indicatorPosition, setIndicatorPosition] = React.useState({ x: 0, y: 0 });
-    let svgWidth = 100;
-    let svgHeight = 100;
-
-    const panResponder = PanResponder.create({
-        onPanResponderMove:
-            evt => {
-                const touches = evt.nativeEvent.touches;
-                const length = touches.length;
-                if (length === 2) {
-                    const [touch1, touch2] = touches;
-                    const all = {
-                        t1x: touch1.locationX,
-                        t1y: touch1.locationY,
-                        t2x: touch2.locationX,
-                        t2y: touch2.locationY
-                    };
-
-                    const distance = calcDistance(all.t1x, all.t1y, all.t2x, all.t2y);
-
-                    svgWidth = distance;
-                    svgHeight = distance;
-
-                    setIndicatorPosition(indicatorPosition)
-                }
-            },
-        onPanResponderGrant: () => { },
-        onPanResponderTerminate: () => { },
-        onMoveShouldSetPanResponder: () => true,
-        onStartShouldSetPanResponder: () => true,
-        onShouldBlockNativeResponder: () => true,
-        onPanResponderTerminationRequest: () => true,
-        onMoveShouldSetPanResponderCapture: () => true,
-        onStartShouldSetPanResponderCapture: () => true,
-    })
 
     React.useEffect(() => {
         createFretFreq();
@@ -136,22 +102,23 @@ const Scale = () => {
         const xIndex = parseInt(touchX / (totalWidth / 14));
         const yIndex = parseInt(touchY / (height / 7));
 
-
         if (yIndex == lastYIndex) {
             fixedNotes[`${xIndex}-${yIndex}`] = { indicatorPosition, indexes: { xIndex, yIndex } }
+            forceUpdate();
         }
 
         lastYIndex = yIndex;
 
-        setIndicatorPosition({
-            x: parseInt(xIndex * (totalWidth / 14)) + (totalWidth / 14) / 2,
-            y: parseInt(height / 7 + (yIndex * (height / 7))),
-        })
+        if(yIndex == 0 || yIndex <= 5) {
+            setIndicatorPosition({
+                x: parseInt(xIndex * (totalWidth / 14)) + (totalWidth / 14) / 2,
+                y: parseInt(height / 7 + (yIndex * (height / 7))),
+            });
+        }
     }
 
     return (
         <ScrollView
-            {...panResponder.panHandlers}
             showsHorizontalScrollIndicator={false}
             horizontal={true}
             contentContainerStyle={{
