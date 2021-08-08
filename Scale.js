@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, Dimensions } from 'react-native'
+import { ScrollView, PanResponder, Dimensions } from 'react-native'
 
 import Svg, {
     Circle,
@@ -53,25 +53,25 @@ const getFrequency = (note) => {
 const createFretFreq = () => {
     const guitarNotes = ['E', 'A', 'D', 'G', 'B', 'E'];
     const fret = {};
-    
+
     guitarNotes.forEach(gn => {
         fret[gn] = []
-        
+
         const currentNoteIndex = notes.indexOf(gn);
         let tmpIndex = currentNoteIndex;
         let frequencyFactor = 4;
         Array.from({ length: 14 }, (cur, index) => {
             let currentNote = undefined
             console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex])
-            
-            if(tmpIndex == notes.length - 1) {
+
+            if (tmpIndex == notes.length - 1) {
                 currentNote = notes[0];
                 tmpIndex = 0;
                 fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`) });
                 frequencyFactor++;
                 return
             }
-            
+
             currentNote = notes[tmpIndex];
             fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`) })
             tmpIndex++
@@ -80,11 +80,51 @@ const createFretFreq = () => {
     })
 }
 
+function calcDistance(x1, y1, x2, y2) {
+    const dx = x1 - x2;
+    const dy = y1 - y2;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 const Scale = () => {
     const width = Dimensions.get('window').width;
     const height = Dimensions.get('window').height;
     const totalWidth = width * 5;
     const [indicatorPosition, setIndicatorPosition] = React.useState({ x: 0, y: 0 });
+    let svgWidth = 100;
+    let svgHeight = 100;
+
+    const panResponder = PanResponder.create({
+        onPanResponderMove:
+            evt => {
+                const touches = evt.nativeEvent.touches;
+                const length = touches.length;
+                if (length === 2) {
+                    const [touch1, touch2] = touches;
+                    const all = {
+                        t1x: touch1.locationX,
+                        t1y: touch1.locationY,
+                        t2x: touch2.locationX,
+                        t2y: touch2.locationY
+                    };
+
+                    const distance = calcDistance(all.t1x, all.t1y, all.t2x, all.t2y);
+
+                    svgWidth = distance;
+                    svgHeight = distance;
+
+                    setIndicatorPosition(indicatorPosition)
+                }
+            },
+        onPanResponderGrant: () => { },
+        onPanResponderTerminate: () => { },
+        onMoveShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponder: () => true,
+        onShouldBlockNativeResponder: () => true,
+        onPanResponderTerminationRequest: () => true,
+        onMoveShouldSetPanResponderCapture: () => true,
+        onStartShouldSetPanResponderCapture: () => true,
+    })
 
     React.useEffect(() => {
         createFretFreq();
@@ -107,13 +147,11 @@ const Scale = () => {
             x: parseInt(xIndex * (totalWidth / 14)) + (totalWidth / 14) / 2,
             y: parseInt(height / 7 + (yIndex * (height / 7))),
         })
-        console.log(parseInt(touchY % (height / 7)))
-        if (parseInt(touchY % (height / 7)) >= 10) {
-        }
     }
 
     return (
         <ScrollView
+            {...panResponder.panHandlers}
             showsHorizontalScrollIndicator={false}
             horizontal={true}
             contentContainerStyle={{
@@ -122,9 +160,9 @@ const Scale = () => {
             }}
         >
             <Svg
-                onTouchStart={updateIndicatorPosition}
-                height="100%"
-                width="100%"
+                onTouchEndCapture={updateIndicatorPosition}
+                height='100%'
+                width='100%'
             >
                 {
                     Array.from({ length: 7 }, (cur, index) => {
