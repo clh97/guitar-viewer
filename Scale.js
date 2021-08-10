@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, PanResponder, Dimensions } from 'react-native'
+import { ScrollView, PanResponder, Dimensions, Text as RNText } from 'react-native'
 
 import Svg, {
     Circle,
@@ -26,6 +26,7 @@ import Svg, {
 } from 'react-native-svg';
 
 const notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
+const guitarNotes = ['E1', 'A', 'D', 'G', 'B', 'E2'];
 
 let lastYIndex = undefined;
 let fixedNotes = {};
@@ -47,40 +48,10 @@ const getFrequency = (note) => {
         keyNumber = keyNumber + ((octave - 1) * 12) + 1;
     }
 
-    return 440 * Math.pow(2, (keyNumber - 49) / 12);
+    return (440 * Math.pow(2, (keyNumber - 49) / 12)).toFixed(2);
 }
 
-const createFretFreq = () => {
-    const guitarNotes = ['E', 'A', 'D', 'G', 'B', 'E'];
-    const fret = {};
-
-    guitarNotes.forEach(gn => {
-        fret[gn] = [];
-
-        const currentNoteIndex = notes.indexOf(gn);
-        let tmpIndex = currentNoteIndex;
-        let frequencyFactor = 4;
-        Array.from({ length: 14 }, (cur, index) => {
-            let currentNote = undefined;
-            console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex]);
-
-            if (tmpIndex == notes.length - 1) {
-                currentNote = notes[0];
-                tmpIndex = 0;
-                fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`) });
-                frequencyFactor++;
-                return
-            }
-
-            currentNote = notes[tmpIndex];
-            fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`) })
-            tmpIndex++
-        })
-        console.log(`---------${gn}----------\n\n`)
-    })
-}
-
-function useForceUpdate(){
+function useForceUpdate() {
     const [value, setValue] = React.useState(0); // integer state
     return () => setValue(value => value + 1); // update the state to force render
 }
@@ -91,10 +62,44 @@ const Scale = () => {
     const forceUpdate = useForceUpdate();
     const totalWidth = width * 5;
     const [indicatorPosition, setIndicatorPosition] = React.useState({ x: 0, y: 0 });
+    const [fretFreq, setFretFreq] = React.useState({});
 
     React.useEffect(() => {
-        createFretFreq();
+        setFretFreq(createFretFreq());
     }, [])
+
+    const createFretFreq = () => {
+        const fret = {};
+
+        guitarNotes.forEach((gn, gnIndex) => {
+            fret[gn] = [];
+
+            const currentNoteIndex = notes.indexOf(gn[0]);
+            let tmpIndex = currentNoteIndex;
+            let frequencyFactor = 4;
+            const posY = gnIndex * (height / 7);
+            Array.from({ length: 14 }, (cur, index) => {
+                let currentNote = undefined;
+                const posX = (index + 1) * (width / 14);
+                console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex]);
+
+                if (tmpIndex == notes.length ) {
+                    currentNote = notes[0];
+                    tmpIndex = 0;
+                    fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`), position: { posX, posY } });
+                    frequencyFactor++;
+                    return
+                }
+
+                currentNote = notes[tmpIndex];
+                fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`), position: { posX, posY } })
+                tmpIndex++
+            })
+            console.log(`---------${gn}----------\n\n`)
+        })
+
+        return fret;
+    }
 
     const updateIndicatorPosition = e => {
         const { locationX: touchX, locationY: touchY } = e.nativeEvent;
@@ -109,7 +114,7 @@ const Scale = () => {
 
         lastYIndex = yIndex;
 
-        if(yIndex == 0 || yIndex <= 5) {
+        if (yIndex == 0 || yIndex <= 5) {
             setIndicatorPosition({
                 x: parseInt(xIndex * (totalWidth / 14)) + (totalWidth / 14) / 2,
                 y: parseInt(height / 7 + (yIndex * (height / 7))),
@@ -125,11 +130,15 @@ const Scale = () => {
                 width: totalWidth,
                 height: height,
             }}
+            overScrollMode='never'
         >
             <Svg
                 onTouchEndCapture={updateIndicatorPosition}
                 height='100%'
                 width='100%'
+                style={{
+                    position: 'relative',
+                }}
             >
                 {
                     Array.from({ length: 7 }, (cur, index) => {
@@ -142,20 +151,26 @@ const Scale = () => {
                                     height={height / 7}
                                     stroke="black"
                                     strokeWidth="1"
-                                    fill="#f1f1f1"
+                                    fill="#573e00"
                                 />
-                                <Text
-                                    fill="none"
-                                    stroke="red"
-                                    fontSize="20"
-                                    fontWeight="bold"
-                                    x="30"
-                                    y={(index * (height / 7)).toString()}
-                                    textAnchor="middle"
-                                >
-                                    {parseInt(index * (height / 7))}
-                                </Text>
                             </React.Fragment>
+                        )
+                    })
+                }
+                {
+                    guitarNotes.map((note, index) => {
+                        return (
+                            <Text
+                                fill="red"
+                                stroke="black"
+                                fontSize="20"
+                                fontWeight="bold"
+                                x="20"
+                                y={(height / 7) + index * (height / 7)}
+                                textAnchor="middle"
+                            >
+                                {note[0]}
+                            </Text>
                         )
                     })
                 }
@@ -199,6 +214,7 @@ const Scale = () => {
                             key={key}
                             onPressOut={() => {
                                 delete fixedNotes[key];
+                                forceUpdate()
                             }}
                             cx={fixedNotes[key].indicatorPosition.x}
                             cy={fixedNotes[key].indicatorPosition.y}
@@ -210,6 +226,25 @@ const Scale = () => {
                     ))
                 }
             </Svg>
+            {
+                Object.keys(fretFreq).map((ffKey, ffIndex) => {
+                    return Object.keys(fretFreq[ffKey]).map((nKey, nIndex) => {
+                        return (
+                            <RNText
+                                key={`${ffIndex}-${nIndex}`}
+                                style={{
+                                    position: 'absolute',
+                                    color: 'white',
+                                    left: nIndex * (totalWidth / 14),
+                                    top: (height / 7) + fretFreq[ffKey][nKey].position.posY,
+                                }}
+                            >
+                                {fretFreq[ffKey][nKey].note} - {fretFreq[ffKey][nKey].freq}Hz
+                            </RNText>
+                        )
+                    })
+                })
+            }
         </ScrollView>
     )
 }
