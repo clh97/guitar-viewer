@@ -26,13 +26,15 @@ import Svg, {
 } from 'react-native-svg';
 
 const notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
-const guitarNotes = ['E1', 'A', 'D', 'G', 'B', 'E2'];
+const guitarNotes = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
 
 let lastYIndex = undefined;
 let fixedNotes = {};
 
 const getFrequency = (note) => {
     let octave, keyNumber;
+
+    console.log(note)
 
     if (note.length === 3) {
         octave = note.charAt(2);
@@ -76,23 +78,26 @@ const Scale = () => {
 
             const currentNoteIndex = notes.indexOf(gn[0]);
             let tmpIndex = currentNoteIndex;
-            let frequencyFactor = 4;
+            let frequencyFactor = parseInt(gn[1]);
             const posY = gnIndex * (height / 7);
             Array.from({ length: 14 }, (cur, index) => {
                 let currentNote = undefined;
                 const posX = (index + 1) * (width / 14);
-                console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex]);
+                const frequency = getFrequency((notes[tmpIndex] + frequencyFactor).toString());
 
-                if (tmpIndex == notes.length ) {
+                console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex], '\tfreq:', frequency);
+                
+                if (tmpIndex == notes.length - 1) {
                     currentNote = notes[0];
                     tmpIndex = 0;
-                    fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`), position: { posX, posY } });
-                    frequencyFactor++;
+                    fret[gn].push({ note: currentNote, freq: frequency, position: { posX, posY } });
                     return
+                } else if (tmpIndex == 2) {
+                    frequencyFactor = frequencyFactor + 1;
                 }
 
                 currentNote = notes[tmpIndex];
-                fret[gn].push({ note: currentNote, freq: getFrequency(`${currentNote}${frequencyFactor}`), position: { posX, posY } })
+                fret[gn].push({ note: currentNote, freq: frequency, position: { posX, posY } })
                 tmpIndex++
             })
             console.log(`---------${gn}----------\n\n`)
@@ -161,6 +166,7 @@ const Scale = () => {
                     guitarNotes.map((note, index) => {
                         return (
                             <Text
+                                key={`${note}-${index}`}
                                 fill="red"
                                 stroke="black"
                                 fontSize="20"
@@ -249,4 +255,4 @@ const Scale = () => {
     )
 }
 
-export default Scale
+export default React.memo(Scale)
