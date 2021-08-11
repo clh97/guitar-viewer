@@ -33,9 +33,6 @@ let fixedNotes = {};
 
 const getFrequency = (note) => {
     let octave, keyNumber;
-
-    console.log(note)
-
     if (note.length === 3) {
         octave = note.charAt(2);
     } else {
@@ -83,12 +80,16 @@ const Scale = () => {
             Array.from({ length: 14 }, (cur, index) => {
                 let currentNote = undefined;
                 const posX = (index + 1) * (width / 14);
-                const frequency = getFrequency((notes[tmpIndex] + frequencyFactor).toString());
-
-                console.log(index, '\ttmpIndex:', tmpIndex, '\tfreqFactor:', frequencyFactor, '\t', notes[tmpIndex], '\tfreq:', frequency);
+                const frequencyNotation = index => (notes[index] + frequencyFactor).toString();
+                let frequency = getFrequency(
+                    frequencyNotation(tmpIndex)
+                );
                 
                 if (tmpIndex == notes.length - 1) {
                     currentNote = notes[0];
+                    frequency = getFrequency(
+                        frequencyNotation(tmpIndex).toString()
+                    );
                     tmpIndex = 0;
                     fret[gn].push({ note: currentNote, freq: frequency, position: { posX, posY } });
                     return
@@ -96,9 +97,11 @@ const Scale = () => {
                     frequencyFactor = frequencyFactor + 1;
                 }
 
+                console.log(index, '\ttmpIndex:', tmpIndex, '\t', notes[tmpIndex], '\tfreqFactor:', frequencyFactor, '\tfreq:', frequency, '\tfreqNotation:', frequencyNotation(tmpIndex));
+
+                tmpIndex++;
                 currentNote = notes[tmpIndex];
                 fret[gn].push({ note: currentNote, freq: frequency, position: { posX, posY } })
-                tmpIndex++
             })
             console.log(`---------${gn}----------\n\n`)
         })
@@ -156,7 +159,7 @@ const Scale = () => {
                                     height={height / 7}
                                     stroke="black"
                                     strokeWidth="1"
-                                    fill="#573e00"
+                                    fill="#624739"
                                 />
                             </React.Fragment>
                         )
@@ -167,12 +170,12 @@ const Scale = () => {
                         return (
                             <Text
                                 key={`${note}-${index}`}
-                                fill="red"
+                                fill="white"
                                 stroke="black"
                                 fontSize="20"
                                 fontWeight="bold"
                                 x="20"
-                                y={(height / 7) + index * (height / 7)}
+                                y={(height / 7) + index * (height / 7) + 8}
                                 textAnchor="middle"
                             >
                                 {note[0]}
@@ -185,7 +188,7 @@ const Scale = () => {
                         return (
                             <React.Fragment key={index}>
                                 <Text
-                                    fill="none"
+                                    fill="white"
                                     stroke="black"
                                     fontSize="20"
                                     fontWeight="bold"
@@ -210,7 +213,7 @@ const Scale = () => {
                 <Circle
                     cx={indicatorPosition.x}
                     cy={indicatorPosition.y}
-                    r="20"
+                    r="15"
                     stroke="black"
                     strokeWidth="2.5"
                 />
@@ -224,9 +227,9 @@ const Scale = () => {
                             }}
                             cx={fixedNotes[key].indicatorPosition.x}
                             cy={fixedNotes[key].indicatorPosition.y}
-                            r="20"
+                            r="10"
                             stroke="black"
-                            fill="red"
+                            fill="white"
                             strokeWidth="2.5"
                         />
                     ))
@@ -234,6 +237,9 @@ const Scale = () => {
             </Svg>
             {
                 Object.keys(fretFreq).map((ffKey, ffIndex) => {
+                    // if(ffKey[0] == 'B') {
+                    //     console.log(fretFreq[ffKey])
+                    // }
                     return Object.keys(fretFreq[ffKey]).map((nKey, nIndex) => {
                         return (
                             <RNText
@@ -241,8 +247,8 @@ const Scale = () => {
                                 style={{
                                     position: 'absolute',
                                     color: 'white',
-                                    left: nIndex * (totalWidth / 14),
-                                    top: (height / 7) + fretFreq[ffKey][nKey].position.posY,
+                                    left: (nIndex + 1) * (totalWidth / 14) - 80,
+                                    top: (height / 7) + fretFreq[ffKey][nKey].position.posY - 8,
                                 }}
                             >
                                 {fretFreq[ffKey][nKey].note} - {fretFreq[ffKey][nKey].freq}Hz
