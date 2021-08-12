@@ -4,6 +4,7 @@ import { ScrollView, Dimensions, Text as RNText } from 'react-native'
 import Svg, {
     Circle,
     Text,
+    Line,
     Rect,
 } from 'react-native-svg';
 
@@ -70,7 +71,7 @@ const Scale = () => {
                 let frequency = getFrequency(
                     frequencyNotation(tmpIndex)
                 );
-                
+
                 if (tmpIndex == notes.length - 1) {
                     currentNote = notes[0];
                     frequency = getFrequency(
@@ -132,25 +133,9 @@ const Scale = () => {
                 width='100%'
                 style={{
                     position: 'relative',
+                    backgroundColor: "#624739"
                 }}
             >
-                {
-                    Array.from({ length: noteQuantity + 1 }, (cur, index) => {
-                        return (
-                            <React.Fragment key={index}>
-                                <Rect
-                                    x="0"
-                                    y={(index * (height / (noteQuantity + 1))).toString()}
-                                    width="100%"
-                                    height={height / (noteQuantity + 1)}
-                                    stroke="#805b49"
-                                    strokeWidth="1"
-                                    fill="#624739"
-                                />
-                            </React.Fragment>
-                        )
-                    })
-                }
                 {
                     guitarNotes.map((note, index) => {
                         return (
@@ -184,14 +169,42 @@ const Scale = () => {
                                 >
                                     {index}
                                 </Text>
-                                <Rect
-                                    x={(index * (totalWidth / fretQuantity)).toString()}
-                                    y="0"
-                                    width={totalWidth / fretQuantity}
-                                    height="100%"
-                                    stroke="black"
-                                    strokeWidth="6"
+                                {
+                                    index != 0 && <Line
+                                        x1={(index * (totalWidth / fretQuantity)).toString()}
+                                        x2={(index * (totalWidth / fretQuantity)).toString()}
+                                        y1="0"
+                                        y2={height}
+                                        width={totalWidth / fretQuantity}
+                                        stroke="#805b49"
+                                        strokeWidth="6"
+                                    />
+                                }
+                            </React.Fragment>
+                        )
+                    })
+                }
+                {
+                    Array.from({ length: noteQuantity + 1 }, (cur, index) => {
+                        return (
+                            <React.Fragment key={index}>
+                                <Line
+                                    x1="0"
+                                    x2={totalWidth}
+                                    y1={index * (height / (noteQuantity + 1))}
+                                    y2={index * (height / (noteQuantity + 1))}
+                                    stroke="gray"
+                                    strokeWidth="3"
                                 />
+                                {/* <Rect
+                                    x="0"
+                                    y={(index * (height / (noteQuantity + 1))).toString()}
+                                    width="100%"
+                                    height={height / (noteQuantity + 1)}
+                                    stroke="gray"
+                                    strokeWidth="3"
+                                    fill="#624739"
+                                /> */}
                             </React.Fragment>
                         )
                     })
