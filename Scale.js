@@ -25,8 +25,12 @@ import Svg, {
     Mask,
 } from 'react-native-svg';
 
+
 const notes = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 const guitarNotes = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
+
+const fretQuantity = 14;
+const noteQuantity = guitarNotes.length;
 
 let lastYIndex = undefined;
 let fixedNotes = {};
@@ -59,7 +63,7 @@ const Scale = () => {
     const width = Dimensions.get('window').width;
     const height = Dimensions.get('window').height;
     const forceUpdate = useForceUpdate();
-    const totalWidth = width * 5;
+    const totalWidth = width * 3;
     const [indicatorPosition, setIndicatorPosition] = React.useState({ x: 0, y: 0 });
     const [fretFreq, setFretFreq] = React.useState({});
 
@@ -76,10 +80,10 @@ const Scale = () => {
             const currentNoteIndex = notes.indexOf(gn[0]);
             let tmpIndex = currentNoteIndex;
             let frequencyFactor = parseInt(gn[1]);
-            const posY = gnIndex * (height / 7);
-            Array.from({ length: 14 }, (cur, index) => {
+            const posY = gnIndex * (height / (noteQuantity + 1));
+            Array.from({ length: fretQuantity }, (cur, index) => {
                 let currentNote = undefined;
-                const posX = (index + 1) * (width / 14);
+                const posX = (index + 1) * (width / fretQuantity);
                 const frequencyNotation = index => (notes[index] + frequencyFactor).toString();
                 let frequency = getFrequency(
                     frequencyNotation(tmpIndex)
@@ -97,13 +101,13 @@ const Scale = () => {
                     frequencyFactor = frequencyFactor + 1;
                 }
 
-                console.log(index, '\ttmpIndex:', tmpIndex, '\t', notes[tmpIndex], '\tfreqFactor:', frequencyFactor, '\tfreq:', frequency, '\tfreqNotation:', frequencyNotation(tmpIndex));
+                // console.log(index, '\ttmpIndex:', tmpIndex, '\t', notes[tmpIndex], '\tfreqFactor:', frequencyFactor, '\tfreq:', frequency, '\tfreqNotation:', frequencyNotation(tmpIndex));
 
                 tmpIndex++;
                 currentNote = notes[tmpIndex];
                 fret[gn].push({ note: currentNote, freq: frequency, position: { posX, posY } })
             })
-            console.log(`---------${gn}----------\n\n`)
+            // console.log(`---------${gn}----------\n\n`)
         })
 
         return fret;
@@ -112,8 +116,8 @@ const Scale = () => {
     const updateIndicatorPosition = e => {
         const { locationX: touchX, locationY: touchY } = e.nativeEvent;
 
-        const xIndex = parseInt(touchX / (totalWidth / 14));
-        const yIndex = parseInt(touchY / (height / 7));
+        const xIndex = parseInt(touchX / (totalWidth / fretQuantity));
+        const yIndex = parseInt(touchY / (height / (noteQuantity + 1)));
 
         if (yIndex == lastYIndex) {
             fixedNotes[`${xIndex}-${yIndex}`] = { indicatorPosition, indexes: { xIndex, yIndex } }
@@ -124,8 +128,8 @@ const Scale = () => {
 
         if (yIndex == 0 || yIndex <= 5) {
             setIndicatorPosition({
-                x: parseInt(xIndex * (totalWidth / 14)) + (totalWidth / 14) / 2,
-                y: parseInt(height / 7 + (yIndex * (height / 7))),
+                x: parseInt(xIndex * (totalWidth / fretQuantity)) + (totalWidth / fretQuantity) / 2,
+                y: parseInt(height / (noteQuantity + 1) + (yIndex * (height / (noteQuantity + 1)))),
             });
         }
     }
@@ -154,9 +158,9 @@ const Scale = () => {
                             <React.Fragment key={index}>
                                 <Rect
                                     x="0"
-                                    y={(index * (height / 7)).toString()}
+                                    y={(index * (height / (noteQuantity + 1))).toString()}
                                     width="100%"
-                                    height={height / 7}
+                                    height={height / (noteQuantity + 1)}
                                     stroke="black"
                                     strokeWidth="1"
                                     fill="#624739"
@@ -175,7 +179,7 @@ const Scale = () => {
                                 fontSize="20"
                                 fontWeight="bold"
                                 x="20"
-                                y={(height / 7) + index * (height / 7) + 8}
+                                y={(height / (noteQuantity + 1)) + index * (height / (noteQuantity + 1)) + 8}
                                 textAnchor="middle"
                             >
                                 {note[0]}
@@ -192,16 +196,16 @@ const Scale = () => {
                                     stroke="black"
                                     fontSize="20"
                                     fontWeight="bold"
-                                    x={(index * (totalWidth / 14) - ((totalWidth / 14) / 2)).toString()}
+                                    x={(index * (totalWidth / fretQuantity) - ((totalWidth / fretQuantity) / 2)).toString()}
                                     y="40"
                                     textAnchor="middle"
                                 >
                                     {index}
                                 </Text>
                                 <Rect
-                                    x={(index * (totalWidth / 14)).toString()}
+                                    x={(index * (totalWidth / fretQuantity)).toString()}
                                     y="0"
-                                    width={totalWidth / 14}
+                                    width={totalWidth / fretQuantity}
                                     height="100%"
                                     stroke="black"
                                     strokeWidth="6"
@@ -237,9 +241,6 @@ const Scale = () => {
             </Svg>
             {
                 Object.keys(fretFreq).map((ffKey, ffIndex) => {
-                    // if(ffKey[0] == 'B') {
-                    //     console.log(fretFreq[ffKey])
-                    // }
                     return Object.keys(fretFreq[ffKey]).map((nKey, nIndex) => {
                         return (
                             <RNText
@@ -247,8 +248,8 @@ const Scale = () => {
                                 style={{
                                     position: 'absolute',
                                     color: 'white',
-                                    left: (nIndex + 1) * (totalWidth / 14) - 80,
-                                    top: (height / 7) + fretFreq[ffKey][nKey].position.posY - 8,
+                                    left: (nIndex + 1) * (totalWidth / fretQuantity) - 80,
+                                    top: (height / (noteQuantity + 1)) + fretFreq[ffKey][nKey].position.posY - 8,
                                 }}
                             >
                                 {fretFreq[ffKey][nKey].note} - {fretFreq[ffKey][nKey].freq}Hz
