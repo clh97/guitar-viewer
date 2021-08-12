@@ -135,7 +135,7 @@ const Scale = () => {
                 }}
             >
                 {
-                    Array.from({ length: 7 }, (cur, index) => {
+                    Array.from({ length: noteQuantity + 1 }, (cur, index) => {
                         return (
                             <React.Fragment key={index}>
                                 <Rect
@@ -143,7 +143,7 @@ const Scale = () => {
                                     y={(index * (height / (noteQuantity + 1))).toString()}
                                     width="100%"
                                     height={height / (noteQuantity + 1)}
-                                    stroke="black"
+                                    stroke="#805b49"
                                     strokeWidth="1"
                                     fill="#624739"
                                 />
@@ -170,7 +170,7 @@ const Scale = () => {
                     })
                 }
                 {
-                    Array.from({ length: 15 }, (cur, index) => {
+                    Array.from({ length: fretQuantity + 1 }, (cur, index) => {
                         return (
                             <React.Fragment key={index}>
                                 <Text
