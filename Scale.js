@@ -137,24 +137,6 @@ const Scale = () => {
                 }}
             >
                 {
-                    guitarNotes.map((note, index) => {
-                        return (
-                            <Text
-                                key={`${note}-${index}`}
-                                fill="white"
-                                stroke="black"
-                                fontSize="20"
-                                fontWeight="bold"
-                                x="20"
-                                y={(height / (noteQuantity + 1)) + index * (height / (noteQuantity + 1)) + 8}
-                                textAnchor="middle"
-                            >
-                                {note[0]}
-                            </Text>
-                        )
-                    })
-                }
-                {
                     Array.from({ length: fretQuantity + 1 }, (cur, index) => {
                         return (
                             <React.Fragment key={index}>
@@ -196,15 +178,6 @@ const Scale = () => {
                                     stroke="gray"
                                     strokeWidth="3"
                                 />
-                                {/* <Rect
-                                    x="0"
-                                    y={(index * (height / (noteQuantity + 1))).toString()}
-                                    width="100%"
-                                    height={height / (noteQuantity + 1)}
-                                    stroke="gray"
-                                    strokeWidth="3"
-                                    fill="#624739"
-                                /> */}
                             </React.Fragment>
                         )
                     })
@@ -232,6 +205,24 @@ const Scale = () => {
                             strokeWidth="2.5"
                         />
                     ))
+                }
+                {
+                    guitarNotes.map((note, index) => {
+                        return (
+                            <Text
+                                key={`${note}-${index}`}
+                                fill="white"
+                                stroke="black"
+                                fontSize="20"
+                                fontWeight="bold"
+                                x="20"
+                                y={(height / (noteQuantity + 1)) + index * (height / (noteQuantity + 1)) + 8}
+                                textAnchor="middle"
+                            >
+                                {note[0]}
+                            </Text>
+                        )
+                    })
                 }
             </Svg>
             {
