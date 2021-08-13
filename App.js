@@ -1,16 +1,33 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Scale from './Scale';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import Home from './src/screens/Home';
+import Scale from './src/screens/Scale';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Scale />
+    <>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home" screenOptions={{
+          statusBarHidden: true,
+          headerShown: false,
+        }}>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Scale" component={Scale} />
+        </Stack.Navigator>
+      </NavigationContainer>
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }
+// <View style={styles.container}>
+
+// </View>
 
 const styles = StyleSheet.create({
   container: {
