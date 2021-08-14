@@ -4,12 +4,23 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import utils from './src/config/utils';
 import Home from './src/screens/Home';
 import Scale from './src/screens/Scale';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  React.useEffect(() => {
+    (async () => {
+      const collections = await utils.collections.retrieveSavedCollections();
+
+      if (!collections || collections.length <= 0) {
+        await utils.collections.initCollection();
+      }
+    })()
+  }, []);
+
   return (
     <>
       <NavigationContainer>
@@ -25,15 +36,3 @@ export default function App() {
     </>
   );
 }
-// <View style={styles.container}>
-
-// </View>
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

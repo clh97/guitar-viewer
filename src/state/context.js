@@ -1,5 +1,10 @@
-const initialState = {};
+import React from 'react';
 
-const Context = React.createContext(initialState);
+const config = {
+    selectedCollection: 0,
+    setSelectedCollection: () => {},
+};
+
+const Context = React.createContext(config);
 
 export default Context;
