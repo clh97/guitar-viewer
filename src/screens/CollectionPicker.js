@@ -19,12 +19,12 @@ const CollectionPickerButton = (props) => (
 const CollectionPicker = (props) => {
     const { navigation } = props;
 
-    const [ collections, setCollections ] = React.useState([]);
+    const [collections, setCollections] = React.useState([]);
 
     React.useEffect(() => {
         (async () => {
             const savedCollections = await utils.collections.retrieveSavedCollections();
-            setCollections(savedCollections); 
+            setCollections(savedCollections);
         })();
     }, []);
 
@@ -37,22 +37,27 @@ const CollectionPicker = (props) => {
                 style={{
                     fontSize: 24,
                 }}
-            >Choose a collection:</Text>
+            >
+                Pick a collection:
+            </Text>
             {
-                collections.map(collection => (
-                    <CollectionPickerButton
-                        title={collection.title}
-                        style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: 64,
-                            height: 64,
-                            backgroundColor: 'rgba(0, 0, 0, .5)',
-                            margin: 10,
-                        }}
-                        onPress={() => props.onPick(collection.id)}
-                    />
-                ))
+                collections && collections.length > 0 && collections.map((collection, index) => {
+                    return (
+                        <CollectionPickerButton
+                            key={index}
+                            title={collection.title}
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 64,
+                                height: 64,
+                                backgroundColor: 'rgba(0, 0, 0, .5)',
+                                margin: 10,
+                            }}
+                            onPress={() => props.onPick(collection.id)}
+                        />
+                    )
+                })
             }
         </View>
     )

@@ -17,8 +17,12 @@ const CollectionList = (props) => {
 
     React.useEffect(() => {
         (async () => {
-            const savedCollections = await utils.collections.retrieveSavedCollections();
-            setCollections(savedCollections); 
+            try {
+                const savedCollections = await utils.collections.retrieveSavedCollections();
+                setCollections(savedCollections); 
+            } catch (err) {
+                 console.log(err);
+            }
         })();
     }, []);
 
@@ -37,6 +41,7 @@ const CollectionList = (props) => {
                     }}>{title}</Text>
                 )}
             /> */}
+            {console.log(collections)}
             {
                 collections && collections.map(collection => {
                     return (

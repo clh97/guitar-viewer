@@ -28,7 +28,7 @@ const ScaleOptions = (props) => {
   const { fixedNotes } = props;
   const [collectionListModalVisible, setCollectionListModalVisible] = React.useState(false);
   const [collectionPickerModalVisible, setCollectionPickerModalVisible] = React.useState(false);
-  const [selectedCollection, setSelectedCollection] = React.useState(1);
+  const [selectedCollectionId, setSelectedCollectionId] = React.useState(1);
 
   const notesWithFrequencies = Object.keys(fixedNotes).map(key => {
     return {
@@ -46,7 +46,6 @@ const ScaleOptions = (props) => {
         position: 'absolute',
         bottom: 0,
         left: 0,
-        width: constants.width(),
         height: constants.height() / 5,
         opacity: 0.75,
         paddingHorizontal: 20,
@@ -103,15 +102,20 @@ const ScaleOptions = (props) => {
               padding: 12,
             }}
           >
-            {console.log(selectedCollection)}
-            <CollectionPicker onPick={async (pickedCollection) => {
-                setSelectedCollection(pickedCollection);
+            
+            <CollectionPicker onPick={async (pickedId) => {
+                setSelectedCollectionId(pickedId);
                 setCollectionPickerModalVisible(false);
-
-                await utils.collections.updateCollection(pickedCollection, notesWithFrequencies);
-
                 const collections = await utils.collections.retrieveSavedCollections();
-                console.log(collections)
+                const toUpdate = collections.find(collection => collection.id == pickedId);
+
+                if(!toUpdate) {
+                  console.log('no such collection id')
+                  return
+                }
+
+                const newCollections = await utils.collections.insertToCollection(pickedId, notesWithFrequencies);
+
               }
             } />
             <Button title="close" onPress={() => setCollectionPickerModalVisible(false)} />

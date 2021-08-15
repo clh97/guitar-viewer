@@ -50,7 +50,7 @@ const Scale = () => {
     const totalWidth = width * 3;
     const [indicatorPosition, setIndicatorPosition] = React.useState({ x: 0, y: 0 });
     const [fretFreq, setFretFreq] = React.useState({});
-    const [optionsShown, setOptionsShown] = React.useState(false);
+    const [optionsShown, setOptionsShown] = React.useState(true);
 
     React.useEffect(() => {
         setFretFreq(createFretFreq());
