@@ -1,17 +1,11 @@
 {
   "expo": {
-    "name": "guitar-viewer",
-    "slug": "guitar-viewer",
+    "name": "guitar-viewer-2",
+    "slug": "guitar-viewer-2",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ],
-    "android": {
-      "package": "com.calheiros.dev.guitarviewer"
-    },
-    "ios": {
-      "bundleIdentifier": "com.calheiros.dev.guitarviewer"
-    }
+    ]
   },
-  "name": "guitar-viewer"
+  "name": "guitar-viewer-2"
 }

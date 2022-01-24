@@ -211,7 +211,6 @@ const Scale = () => {
               key={key}
               onPressOut={() => {
                 delete fixedNotes[key];
-                forceUpdate();
               }}
               cx={fixedNotes[key].indicatorPosition.x}
               cy={fixedNotes[key].indicatorPosition.y}
