@@ -5,7 +5,13 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "com.calheiros.dev.guitarviewer"
+    },
+    "ios": {
+      "bundleIdentifier": "com.calheiros.dev.guitarviewer"
+    }
   },
   "name": "guitar-viewer"
 }

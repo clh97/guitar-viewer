@@ -1,4 +1,4 @@
-package com.guitarviewer.generated;
+package com.calheiros.dev.guitarviewer.generated;
 
 import java.util.Arrays;
 import java.util.List;

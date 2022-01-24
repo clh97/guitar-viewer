@@ -1,4 +1,4 @@
-package com.guitarviewer;
+package com.calheiros.dev.guitarviewer;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
