@@ -5,8 +5,6 @@ note: personal project - not meant to be the cleanest app ever
 
 # images
 
-[jazzy chord progression that I used to practice some walking bass](github/progression.md)
-
 ![guitar viewer app](github/images/1.jpg "guitar viewer app")
 
 
