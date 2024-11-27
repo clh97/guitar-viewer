@@ -1,7 +1,5 @@
 # guitar-viewer
-React Native app that creates a visual representation of the guitar scale.
-
-note: personal project - not meant to be the cleanest app ever
+React Native app that programatically generates a visual representation of the guitar scale.
 
 # images
 
